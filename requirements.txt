@@ -40,6 +40,7 @@ parso==0.8.4
 pexpect==4.9.0
 pillow==11.0.0
 platformdirs==4.3.6
+plotly==5.24.1
 prompt_toolkit==3.0.48
 protobuf==5.28.3
 psutil==6.1.0
@@ -57,6 +58,8 @@ referencing==0.35.1
 requests==2.32.3
 rich==13.9.4
 rpds-py==0.21.0
+scipy==1.14.1
+seaborn==0.13.2
 six==1.16.0
 smmap==5.0.1
 spotipy==2.24.0
