@@ -16,7 +16,7 @@ sns.set_style("whitegrid")
 # Título de la aplicación
 st.title("Análisis de Cambios en las Reproducciones de Taylor Swift Antes y Después de sus Conciertos")
 
-# Sección de introducción
+# Introducción
 st.write("""
 ## Introducción
 
@@ -24,8 +24,6 @@ Este análisis examina cómo cambian las reproducciones de Taylor Swift en Spoti
 
 Utiliza las opciones en la barra lateral para seleccionar una ciudad y ajustar el rango de fechas de análisis.
 """)
-
-
 
 # Datos de los conciertos
 concerts = {
@@ -88,17 +86,13 @@ start_date, end_date = [datetime.combine(d, datetime.min.time()) for d in date_r
 city_data = data.loc[start_date:end_date, selected_city].dropna()
 
 if not city_data.empty:
-    # Crear la figura y los ejes con Seaborn
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    # Graficar los cambios porcentuales
     sns.lineplot(x=city_data.index, y=city_data.values, marker='o', ax=ax, label='Cambios en las reproducciones')
 
-    # Línea vertical para la fecha del concierto con anotación
     ax.axvline(x=concert_date, color='r', linestyle='--')
     ax.text(concert_date, ax.get_ylim()[1]*0.9, 'Fecha del Concierto', rotation=90, color='red', verticalalignment='center')
 
-    # Configurar el gráfico
     ax.set_title(f'Cambios en las reproducciones en {selected_city}', fontsize=16)
     ax.set_xlabel('Fecha', fontsize=14)
     ax.set_ylabel('Cambio porcentual (%)', fontsize=14)
@@ -106,85 +100,55 @@ if not city_data.empty:
     plt.xticks(rotation=45)
     plt.tight_layout()
 
-    # Mostrar el gráfico en Streamlit
     st.pyplot(fig)
 
-    # Mostrar estadísticas adicionales
     st.subheader(f"Análisis Estadístico para {selected_city}")
 
-    # Datos antes y después del concierto
     pre_concert_data = city_data[city_data.index < concert_date]
     post_concert_data = city_data[city_data.index >= concert_date]
 
-    # Calcular estadísticas antes del concierto
     if not pre_concert_data.empty:
         avg_pre_concert = pre_concert_data.mean()
         std_pre_concert = pre_concert_data.std()
-        max_pre_concert = pre_concert_data.max()
-        min_pre_concert = pre_concert_data.min()
-        st.write(f"**Antes del concierto**:")
-        st.write(f"- Cambio porcentual promedio: {avg_pre_concert:.2f}%")
-        st.write(f"- Desviación estándar: {std_pre_concert:.2f}%")
-        st.write(f"- Máximo cambio: {max_pre_concert:.2f}%")
-        st.write(f"- Mínimo cambio: {min_pre_concert:.2f}%")
+        st.write(f"**Antes del concierto:**\n - Promedio: {avg_pre_concert:.2f}%\n - Std: {std_pre_concert:.2f}%")
     else:
-        st.write("No hay datos disponibles **antes** del concierto.")
+        st.write("No hay datos **antes** del concierto.")
 
-    # Calcular estadísticas después del concierto
     if not post_concert_data.empty:
         avg_post_concert = post_concert_data.mean()
         std_post_concert = post_concert_data.std()
-        max_post_concert = post_concert_data.max()
-        min_post_concert = post_concert_data.min()
-        st.write(f"**Después del concierto**:")
-        st.write(f"- Cambio porcentual promedio: {avg_post_concert:.2f}%")
-        st.write(f"- Desviación estándar: {std_post_concert:.2f}%")
-        st.write(f"- Máximo cambio: {max_post_concert:.2f}%")
-        st.write(f"- Mínimo cambio: {min_post_concert:.2f}%")
+        st.write(f"**Después del concierto:**\n - Promedio: {avg_post_concert:.2f}%\n - Std: {std_post_concert:.2f}%")
     else:
-        st.write("No hay datos disponibles **después** del concierto.")
+        st.write("No hay datos **después** del concierto.")
 
-    # Calcular el cambio total entre los períodos
     if not pre_concert_data.empty and not post_concert_data.empty:
         percent_change = ((avg_post_concert - avg_pre_concert) / abs(avg_pre_concert)) * 100
-        st.write(f"**Cambio porcentual total en reproducciones después del concierto:** {percent_change:.2f}%")
+        st.write(f"**Cambio total:** {percent_change:.2f}%")
 
-        # Prueba t de Student
         t_stat, p_value = ttest_ind(post_concert_data, pre_concert_data, equal_var=False)
-        st.write(f"**Prueba t de Student:** estadístico t = {t_stat:.2f}, valor p = {p_value:.4f}")
-        if p_value < 0.05:
-            st.write("La diferencia en las reproducciones es **estadísticamente significativa**.")
-        else:
-            st.write("No se encontró una diferencia estadísticamente significativa en las reproducciones.")
-    else:
-        st.write("No se puede realizar un análisis comparativo completo debido a la falta de datos.")
-
-    # Mostrar la tabla de datos si el usuario lo desea
-    if st.sidebar.checkbox("Mostrar datos en tabla"):
-        st.subheader("Datos de Reproducciones")
-        st.dataframe(city_data)
+        st.write(f"**Prueba t:** t = {t_stat:.2f}, p = {p_value:.4f}")
+        st.write("Significativa." if p_value < 0.05 else "No significativa.")
 else:
-    st.write(f"No hay datos disponibles para {selected_city} en el rango de fechas especificado.")
+    st.write(f"No hay datos para {selected_city} en el rango de fechas.")
 
-# Sección de conclusiones
-st.write("""
-## Conclusiones
+# Botón para seleccionar todas las ciudades
+if "compare_cities" not in st.session_state:
+    st.session_state["compare_cities"] = []
 
-Este análisis proporciona una visión detallada de cómo las reproducciones de Taylor Swift cambian alrededor de las fechas de sus conciertos en diferentes ciudades. Observa las tendencias y considera cómo eventos locales pueden influir en el interés por su música.
+if st.sidebar.button("Seleccionar todas las ciudades"):
+    st.session_state["compare_cities"] = city_options.copy()
 
-Explora diferentes ciudades y ajusta el rango de fechas para descubrir patrones interesantes.
-""")
-
-# Sección opcional: Comparación entre ciudades
 st.sidebar.subheader("Comparación entre Ciudades")
-compare_cities = st.sidebar.multiselect("Selecciona las ciudades para comparar:", city_options, default=[selected_city])
+compare_cities = st.sidebar.multiselect(
+    "Selecciona las ciudades para comparar:", 
+    city_options, 
+    default=st.session_state["compare_cities"]
+)
 
 if compare_cities:
-    st.subheader("Comparación de Cambios en Reproducciones entre Ciudades")
-    comparison_list = []  # Inicializamos una lista vacía
+    comparison_list = []
 
     for city in compare_cities:
-        # Obtener datos para cada ciudad
         city_concert_date = concert_dates[city]
         city_start_date = city_concert_date - timedelta(days=30)
         city_end_date = city_concert_date + timedelta(days=30)
@@ -195,26 +159,23 @@ if compare_cities:
             avg_post = city_series[city_series.index >= city_concert_date].mean()
             if pd.notnull(avg_pre) and pd.notnull(avg_post):
                 percent_change = ((avg_post - avg_pre) / abs(avg_pre)) * 100
-                # Agregamos el diccionario a la lista
                 comparison_list.append({'Ciudad': city, 'Cambio porcentual': percent_change})
 
     if comparison_list:
-        # Creamos el DataFrame a partir de la lista
         comparison_data = pd.DataFrame(comparison_list)
-        # Graficar el cambio porcentual para cada ciudad seleccionada
         fig_comp, ax_comp = plt.subplots(figsize=(10, 6))
         sns.barplot(x='Ciudad', y='Cambio porcentual', data=comparison_data, ax=ax_comp)
         ax_comp.set_title('Cambio Porcentual en Reproducciones Después del Concierto')
-        ax_comp.set_ylabel('Cambio porcentual (%)')
         plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(fig_comp)
     else:
-        st.write("No hay suficientes datos para comparar las ciudades seleccionadas.")
+        st.write("No hay datos suficientes para comparar.")
 
 st.write("""
-##### Este analisis fue hecho por:
-Pablo Armando Mac Beath Milián\n
-Cristina Sánchez Rivera\n
-Oscar Galán Franco\n
-Emilio Pineda Tovar """)
+##### Análisis realizado por:
+- Pablo Armando Mac Beath Milián
+- Cristina Sánchez Rivera
+- Oscar Galán Franco
+- Emilio Pineda Tovar
+""")
