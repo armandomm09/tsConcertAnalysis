@@ -53,7 +53,7 @@ def load_data():
 try:
     data = load_data()
 except FileNotFoundError:
-    st.error("El archivo 'ts_stream_data.csv' no se encontró. Por favor, asegúrate de que el archivo exista en el directorio actual.")
+    st.error("El archivo 'ts_stream_data.csv' no se encontró. Asegúrate de que el archivo exista en el directorio actual.")
     st.stop()
 
 # Asegurarse de que las columnas numéricas estén en el tipo correcto
