@@ -25,18 +25,19 @@ Este análisis examina cómo cambian las reproducciones de Taylor Swift en Spoti
 Utiliza las opciones en la barra lateral para seleccionar una ciudad y ajustar el rango de fechas de análisis.
 """)
 
+
+
 # Datos de los conciertos
 concerts = {
-    "Tokyo": "Feb 7, 2024",
+    "Sao Paulo": "Nov 23, 2023",
     "Melbourne": "Feb 16, 2024",
     "Sydney": "Feb 23, 2024",
     "Singapore": "Mar 2, 2024",
     "Stockholm": "May 17, 2024",
+    "Manchester": "Jun 13, 2024",
     "Dublin": "Jun 28, 2024",
     "Paris": "Jun 3, 2024",
     "London": "Jun 21, 2024",
-    "Orlando": "Oct 18, 2024",
-    "Rio de Janeiro": "Nov 17, 2024"
 }
 
 # Convertir las fechas de los conciertos a formato datetime
@@ -211,3 +212,9 @@ if compare_cities:
     else:
         st.write("No hay suficientes datos para comparar las ciudades seleccionadas.")
 
+st.write("""
+##### Este analisis fue hecho por:
+Pablo Armando Mac Beath Milián\n
+Cristina Sánchez Rivera\n
+Oscar Galán Franco\n
+Emilio Pineda Tovar """)
