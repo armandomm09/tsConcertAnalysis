@@ -7,16 +7,13 @@ import seaborn as sns
 from datetime import datetime, timedelta
 from scipy.stats import ttest_ind
 
-# Configuración inicial de la página de Streamlit
 st.set_page_config(page_title="Análisis de Reproducciones de Taylor Swift", layout="wide")
 
-# Estilos de Seaborn
 sns.set_style("whitegrid")
 
-# Título de la aplicación
 st.title("Análisis de Cambios en las Reproducciones de Taylor Swift Antes y Después de sus Conciertos")
 
-# Introducción
+
 st.write("""
 ## Introducción
 
@@ -24,8 +21,6 @@ Este análisis examina cómo cambian las reproducciones de Taylor Swift en Spoti
 
 Utiliza las opciones en la barra lateral para seleccionar una ciudad y ajustar el rango de fechas de análisis.
 """)
-
-# Datos de los conciertos
 concerts = {
     "Sao Paulo": "Nov 23, 2023",
     "Melbourne": "Feb 16, 2024",
@@ -38,10 +33,9 @@ concerts = {
     "London": "Jun 21, 2024",
 }
 
-# Convertir las fechas de los conciertos a formato datetime
+
 concert_dates = {city: datetime.strptime(date, "%b %d, %Y") for city, date in concerts.items()}
 
-# Cargar los datos desde el archivo CSV
 @st.cache_data
 def load_data():
     data = pd.read_csv('ts_stream_data.csv', parse_dates=['Date'])
@@ -54,24 +48,21 @@ except FileNotFoundError:
     st.error("El archivo 'ts_stream_data.csv' no se encontró. Asegúrate de que el archivo exista en el directorio actual.")
     st.stop()
 
-# Asegurarse de que las columnas numéricas estén en el tipo correcto
 for city in concerts.keys():
     if city in data.columns:
         data[city] = pd.to_numeric(data[city], errors='coerce')
 
-# Interfaz de usuario en Streamlit
+
 st.sidebar.title("Opciones de Visualización")
 city_options = list(concert_dates.keys())
 selected_city = st.sidebar.selectbox("Selecciona una ciudad:", city_options)
 
-# Obtener la fecha del concierto
 concert_date = concert_dates[selected_city]
 
-# Definir el rango de fechas predeterminado (un mes antes y después del concierto)
+
 default_start_date = concert_date - timedelta(days=30)
 default_end_date = concert_date + timedelta(days=30)
 
-# Añadir controles para el rango de fechas
 st.sidebar.subheader("Ajuste del Rango de Fechas")
 date_range = st.sidebar.slider(
     "Selecciona el rango de fechas:",
@@ -82,7 +73,6 @@ date_range = st.sidebar.slider(
 
 start_date, end_date = [datetime.combine(d, datetime.min.time()) for d in date_range]
 
-# Filtrar los datos dentro del rango de fechas
 city_data = data.loc[start_date:end_date, selected_city].dropna()
 
 if not city_data.empty:
